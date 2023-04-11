@@ -6,7 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		tabheaderItem = document.querySelectorAll('.tabheader__item'),
 		tabsParent = document.querySelector('.tabheader__items');
 
-	// tabcontent hide func
+	// tabcontent hide func~
 	function hideTabContent() {
 		tabcontent.forEach(tabs => {
 			tabs.classList.add('hide')
@@ -48,5 +48,31 @@ window.addEventListener('DOMContentLoaded', () => {
 			loader.classList.add('hide');
 		}, 500)
 	}, 1000);
+
+	// modal start
+	const modal = document.querySelector('.modal'),
+		modalOpen = document.querySelector('[data-modal]'),
+		modalClose = document.querySelector('[data-close]');
+
+		const modalTimer = setTimeout(() => {
+			showModal();
+		}, 5000)
+		function showModal() {
+			modal.classList.add('show');
+			modal.classList.remove('hide');
+			clearInterval(modalTimer)
+		}
+		function hideModal() {
+			modal.classList.add('hide');
+			modal.classList.remove('show');
+		}
+		modalOpen.addEventListener('click', showModal);
+		modalClose.addEventListener('click', hideModal);
+
+		modal.addEventListener('click', (e) => {
+			if(e.target === modal) {
+				hideModal();
+			}
+		})
 
 })
