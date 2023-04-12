@@ -6,7 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
 		tabheaderItem = document.querySelectorAll('.tabheader__item'),
 		tabsParent = document.querySelector('.tabheader__items');
 
-	// tabcontent hide func~
+	// tabcontent hide func
 	function hideTabContent() {
 		tabcontent.forEach(tabs => {
 			tabs.classList.add('hide')
@@ -74,5 +74,7 @@ window.addEventListener('DOMContentLoaded', () => {
 				hideModal();
 			}
 		})
+
+		// Date
 
 })
