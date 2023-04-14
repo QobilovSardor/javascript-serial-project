@@ -93,14 +93,14 @@ window.addEventListener('DOMContentLoaded', () => {
 	class MenuCard {
 		constructor(img, alt, title, descr, price, parenElement, ...classes) {
 			this.img = img,
-			this.alt = alt,
-			this.title = title,
-			this.descr = descr,
-			this.price = price,
-			this.transfer = 11000,
-			this.parent = document.querySelector(parenElement),
-			this.classes = classes,
-			this.changeToUSZ()
+				this.alt = alt,
+				this.title = title,
+				this.descr = descr,
+				this.price = price,
+				this.transfer = 11000,
+				this.parent = document.querySelector(parenElement),
+				this.classes = classes,
+				this.changeToUSZ()
 		}
 
 		changeToUSZ() {
@@ -113,7 +113,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			if (this.classes.length === 0) {
 				this.element = 'menu__item';
 				element.classList.add(this.element);
-			} else{ 
+			} else {
 				this.classes.forEach(className => element.classList.add(className))
 			}
 
@@ -155,4 +155,45 @@ window.addEventListener('DOMContentLoaded', () => {
 		20,
 		'.menu .container'
 	).render()
+
+	// FormData
+
+	const forms = document.querySelectorAll('form');
+
+	forms.forEach(item => {
+		postData(item);
+	})
+
+	const msg = {
+		loadding: 'Loadding...',
+		successfully: "Habar muvofaqiyatli jo'natilindi",
+		failure: "Nimadir hato keti tekshirib qaytadan urunib ko'ring"
+	}
+
+	function postData(form) {
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			const msgText = document.createElement('div');
+			msgText.innerHTML = msg.loadding;
+			form.append(msgText);
+			const request = new XMLHttpRequest();
+			request.open('POST', 'server.php');
+			// request.setRequestHeader('Content-type', 'multipart/form-data');
+			const formData = new FormData(form);
+			request.send(formData);
+
+			request.addEventListener('load', () => {
+				if (request.status === 200) {
+					console.log(request.response);
+					msgText.innerHTML = msg.successfully;
+					setTimeout(() => {
+						msgText.remove();
+					}, 2000);
+					form.reset();
+				} else{
+					msgText.innerHTML = msg.failure;
+				}
+			})
+		})
+	}
 })
