@@ -51,8 +51,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// modal start
 	const modal = document.querySelector('.modal'),
-		modalOpen = document.querySelector('[data-modal]'),
-		modalClose = document.querySelector('[data-close]');
+		modalOpen = document.querySelector('[data-modal]');
 
 	const modalTimer = setTimeout(() => {
 		showModal();
@@ -67,9 +66,9 @@ window.addEventListener('DOMContentLoaded', () => {
 		modal.classList.remove('show');
 	}
 	modalOpen.addEventListener('click', showModal);
-	modalClose.addEventListener('click', hideModal);
+
 	modal.addEventListener('click', (e) => {
-		if (modal === e.target) {
+		if (modal === e.target || e.target.getAttribute('data-close') === '') {
 			hideModal();
 		}
 	})
@@ -176,24 +175,62 @@ window.addEventListener('DOMContentLoaded', () => {
 			const msgText = document.createElement('div');
 			msgText.innerHTML = msg.loadding;
 			form.append(msgText);
-			const request = new XMLHttpRequest();
-			request.open('POST', 'server.php');
-			// request.setRequestHeader('Content-type', 'multipart/form-data');
 			const formData = new FormData(form);
-			request.send(formData);
 
-			request.addEventListener('load', () => {
-				if (request.status === 200) {
-					console.log(request.response);
-					msgText.innerHTML = msg.successfully;
-					setTimeout(() => {
-						msgText.remove();
-					}, 2000);
-					form.reset();
-				} else{
-					msgText.innerHTML = msg.failure;
-				}
+			const obj = {};
+
+			formData.forEach((val, key) => {
+				obj[key] = val
+			})
+
+			fetch('server.php', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(obj)
+			})
+			.then((data) => data.text())
+			.then((data) => {
+				console.log(data);
+				showThanksModal(msg.successfully);
+				msgText.remove();
+			}).catch(() => {
+				showThanksModal(msg.failure);
+			}).finally(() => {
+				form.reset();
 			})
 		})
 	}
+
+	function showThanksModal(message) {
+		const prevModalDialog = document.querySelector('.modal__dialog');
+		prevModalDialog.classList.add('hide');
+		showModal();
+
+		const thanksModal = document.createElement('div');
+		thanksModal.classList.add('modal__dialog');
+
+		thanksModal.innerHTML = `
+			<div class="modal__content">
+				<div class="modal__close" data-close>&times;</div>
+				<div class="modal__title">
+					${message}
+				</div>
+			</div>
+		`
+		document.querySelector('.modal').append(thanksModal);
+
+		setTimeout(() => {
+			thanksModal.remove();
+			prevModalDialog.classList.add('show');
+			prevModalDialog.classList.remove('hide');
+			hideModal();
+		},4000)
+	}
+
+	fetch('db.json')
+	.then(data => data.json())
+	.then(res => console.log(res))
+
 })
