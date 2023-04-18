@@ -130,37 +130,24 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	new MenuCard(
-		'img/tabs/1.png',
-		'vegy',
-		'Plan "Usual"',
-		'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fugit nesciunt facere, sequi exercitationem praesentium ab cupiditate beatae debitis perspiciatis itaque quaerat id modi corporis delectus ratione nobis harum voluptatum in.',
-		10,
-		'.menu .container'
-	).render()
-	new MenuCard(
-		'img/tabs/2.jpg',
-		'elite',
-		'Plan “Premium”',
-		'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fugit nesciunt facere, sequi exercitationem praesentium ab cupiditate beatae debitis perspiciatis itaque quaerat id modi corporis delectus ratione nobis harum voluptatum in.',
-		15,
-		'.menu .container'
-	).render()
-	new MenuCard(
-		'img/tabs/3.jpg',
-		'post',
-		'Plan "VIP"',
-		'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fugit nesciunt facere, sequi exercitationem praesentium ab cupiditate beatae debitis perspiciatis itaque quaerat id modi corporis delectus ratione nobis harum voluptatum in.',
-		20,
-		'.menu .container'
-	).render()
+	async function getRecource(url){
+		const res = fetch(url)
+
+		return (await res).json();
+	}
+
+	getRecource('http://localhost:3000/menu').then(data => {
+		data.forEach(({img, altimg, title, descr, price}) => {
+			new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+		})
+	})
 
 	// FormData
 
 	const forms = document.querySelectorAll('form');
 
 	forms.forEach(item => {
-		postData(item);
+		bindPostData(item);
 	})
 
 	const msg = {
@@ -169,7 +156,19 @@ window.addEventListener('DOMContentLoaded', () => {
 		failure: "Nimadir hato keti tekshirib qaytadan urunib ko'ring"
 	}
 
-	function postData(form) {
+	async function postData(url, data) {
+		const res = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: data
+		})
+
+		return await res.json();
+	}
+
+	function bindPostData(form) {
 		form.addEventListener('submit', (e) => {
 			e.preventDefault();
 			const msgText = document.createElement('div');
@@ -177,29 +176,18 @@ window.addEventListener('DOMContentLoaded', () => {
 			form.append(msgText);
 			const formData = new FormData(form);
 
-			const obj = {};
+			const json = JSON.stringify(Object.fromEntries(formData.entries()))
 
-			formData.forEach((val, key) => {
-				obj[key] = val
-			})
-
-			fetch('server.php', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(obj)
-			})
-			.then((data) => data.text())
-			.then((data) => {
-				console.log(data);
-				showThanksModal(msg.successfully);
-				msgText.remove();
-			}).catch(() => {
-				showThanksModal(msg.failure);
-			}).finally(() => {
-				form.reset();
-			})
+			postData('http://localhost:3000/request', json)
+				.then((data) => {
+					console.log(data);
+					showThanksModal(msg.successfully);
+					msgText.remove();
+				}).catch(() => {
+					showThanksModal(msg.failure);
+				}).finally(() => {
+					form.reset();
+				})
 		})
 	}
 
@@ -226,11 +214,7 @@ window.addEventListener('DOMContentLoaded', () => {
 			prevModalDialog.classList.add('show');
 			prevModalDialog.classList.remove('hide');
 			hideModal();
-		},4000)
+		}, 4000)
 	}
-
-	fetch('db.json')
-	.then(data => data.json())
-	.then(res => console.log(res))
 
 })
