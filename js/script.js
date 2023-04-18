@@ -1,3 +1,5 @@
+
+
 window.addEventListener('DOMContentLoaded', () => {
 	'use strict';
 
@@ -130,14 +132,8 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	async function getRecource(url){
-		const res = fetch(url)
-
-		return (await res).json();
-	}
-
-	getRecource('http://localhost:3000/menu').then(data => {
-		data.forEach(({img, altimg, title, descr, price}) => {
+	axios.get('http://localhost:3000/menu').then(data => {
+		data.data.forEach(({ img, altimg, title, descr, price }) => {
 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
 		})
 	})
@@ -216,5 +212,4 @@ window.addEventListener('DOMContentLoaded', () => {
 			hideModal();
 		}, 4000)
 	}
-
 })
